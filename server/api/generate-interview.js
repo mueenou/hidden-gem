@@ -1,57 +1,68 @@
+import OpenAI from "openai";
+
 export default defineEventHandler(async (event) => {
+  // Get the request body
+  const body = await readBody(event);
+  const { jobTitle, jobDescription } = body;
+
+  // Access runtime config
+  const config = useRuntimeConfig();
+
+  // Initialize OpenAI client
+  const openai = new OpenAI({
+    apiKey: config.public.openaiApiKey,
+  });
+
+  // Construct the prompt in French
+  const prompt = `Générez 5 questions et réponses potentielles bien détaillées pour un entretien d'embauche pour un poste de "${jobTitle}" basé sur la description de poste suivante : "${jobDescription}".
+  Formatez la sortie comme un tableau JSON d'objets, où chaque objet a un champ "question" et un champ "response". Par exemple: \`\`\`json\n[\n  {\n    "question": "Quelles sont vos compétences clés?",\n    "response": "Mes compétences clés incluent la résolution de problèmes, la communication et le travail d'équipe."\n  }\n]\n\`\`\``;
+
   try {
-    // Lire les données envoyées depuis la requête
-    const body = await readBody(event);
-    const { title, description } = body;
+    // Make a request to OpenAI
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "system",
+          content: `Vous êtes un assistant utile qui génère des questions et réponses d'entretien basées sur le titre et la description du poste. Répondez en français et assurez-vous d'inclure le titre du poste dans vos réponses lorsque c'est approprié.`,
+        },
+        { role: "user", content: prompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 1000,
+    });
 
-    // Récupérer la clé API OpenAI depuis la configuration runtime
-    const config = useRuntimeConfig();
-    const apiKey = config.public.openaiApiKey;
-
-    // Vérifier que les données nécessaires sont bien présentes
-    if (!title || !description) {
-      throw new Error("Le titre et la description du job sont requis.");
+    // Get the content from the response
+    const content = completion.choices[0].message?.content;
+    if (!content) {
+      throw new Error("Pas de contenu dans la réponse OpenAI");
     }
 
-    // Requête à l'API OpenAI pour générer des questions
-    const response = await $fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo", // Ou 'gpt-4' selon votre choix
-          messages: [
-            {
-              role: "system",
-              content:
-                "Tu es un assistant pour générer des questions d'entretien d'embauche.",
-            },
-            {
-              role: "user",
-              content: `Génère des questions d'entretien pour un poste intitulé : "${title}". Voici la description du poste : ${description}`,
-            },
-          ],
-          max_tokens: 150,
-        }),
-      }
-    );
+    // Extract JSON from the content
+    const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/);
+    if (!jsonMatch) {
+      throw new Error("Aucun JSON trouvé dans la réponse");
+    }
 
-    // Transformer la réponse en tableau en séparant la chaîne à chaque numéro de question
-    const questionsArray = response.choices[0].message.content
-      .split(/\d+\.\s+/) // Séparer sur les numéros "1. ", "2. ", etc.
-      .filter((q) => q.trim().length > 0); // Supprimer les éléments vides, s'il y en a
+    // Parse the extracted JSON
+    const parsedContent = JSON.parse(jsonMatch[1]);
 
-    // Retourner les questions sous forme de tableau
-    return { questions: questionsArray };
+    // Validate the structure of the parsed content
+    if (
+      !Array.isArray(parsedContent) ||
+      !parsedContent.every((item) => item.question && item.response)
+    ) {
+      throw new Error("Structure de réponse invalide de OpenAI");
+    }
+
+    // Return the parsed and validated response
+    return parsedContent;
   } catch (error) {
-    // Gérer les erreurs et les renvoyer au client
-    return {
-      statusCode: 400,
-      message: error.message,
-    };
+    console.error("Erreur:", error);
+    return createError({
+      statusCode: 500,
+      statusMessage:
+        "Une erreur s'est produite lors du traitement de votre demande.",
+    });
   }
 });

@@ -1,13 +1,9 @@
 <template>
   <div>
     <NuxtRouteAnnouncer />
-    <UHeader />
-    <UMain>
-      <NuxtLayout>
-        <NuxtPage />
-      </NuxtLayout>
-    </UMain>
-    <UFooter />
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
 

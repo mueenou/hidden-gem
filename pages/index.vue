@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen max-w-3xl m-auto flex items-center justify-center">
-    <div class="w-full shadow-md rounded-lg p-8">
+  <UContainer class="min-h-screen m-auto flex items-center justify-center">
+    <div class="w-full">
       <h1 class="text-2xl font-bold text-primary-500 mb-6">
         Générateur d'entretien d'embauche
       </h1>
@@ -10,7 +10,7 @@
         </UFormGroup>
 
         <UFormGroup label="Description du poste" name="description">
-          <UTextarea v-model="jobDescription" placeholder="Description du job..." />
+          <UTextarea v-model="jobDescription" placeholder="Description du job..."/>
         </UFormGroup>
 
         <UButton type="submit" class="w-full py-3 flex justify-center">
@@ -18,11 +18,10 @@
         </UButton>
       </UForm>
     </div>
-  </div>
+  </Ucontainer>
 </template>
 
 <script setup>
-import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const jobTitle = ref("");
@@ -39,7 +38,3 @@ const submitJobDetails = () => {
   });
 };
 </script>
-
-<style>
-/* Aucun style spécifique nécessaire ici grâce à Tailwind */
-</style>

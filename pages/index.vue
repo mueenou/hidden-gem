@@ -13,9 +13,9 @@
           <UTextarea v-model="jobDescription" placeholder="Description du job..."/>
         </UFormGroup>
 
-        <UButton type="submit" class="w-full py-3 flex justify-center">
-          Générer les questions
-        </UButton>
+          <UButton type="submit" class="w-full py-3 flex justify-center">
+            Générer les questions
+          </UButton>
       </UForm>
     </div>
   </Ucontainer>

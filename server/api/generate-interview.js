@@ -14,13 +14,13 @@ export default defineEventHandler(async (event) => {
   });
 
   // Construct the prompt in French
-  const prompt = `Générez 5 questions et réponses potentielles bien détaillées pour un entretien d'embauche pour un poste de "${jobTitle}" basé sur la description de poste suivante : "${jobDescription}".
+  const prompt = `Générez 10 questions et réponses potentielles bien détaillées pour un entretien d'embauche pour un poste de "${jobTitle}" basé sur la description de poste suivante : "${jobDescription}".
   Formatez la sortie comme un tableau JSON d'objets, où chaque objet a un champ "question" et un champ "response". Par exemple: \`\`\`json\n[\n  {\n    "question": "Quelles sont vos compétences clés?",\n    "response": "Mes compétences clés incluent la résolution de problèmes, la communication et le travail d'équipe."\n  }\n]\n\`\`\``;
 
   try {
     // Make a request to OpenAI
     const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",

@@ -39,8 +39,7 @@ export default defineEventHandler(async (event) => {
         });
       }
 
-      const prompt = `Générez 10 questions et réponses d'entretien d'embauche en français pour un poste de "${jobTitle}". 
-      Les réponses doivent être plus concises, environ 2-3 phrases maximum.
+      const prompt = `Générez 5 questions et réponses d'entretien d'embauche en français en fonction de cette offre d'emploi avec comme titre "${jobTitle}" et description "${jobDescription}".
       
       Retournez UNIQUEMENT un tableau JSON avec ce format exact, sans autre texte :
       [
@@ -51,12 +50,12 @@ export default defineEventHandler(async (event) => {
       ]`;
 
       const completion = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4",
         messages: [
           {
             role: "system",
             content:
-              "Vous êtes un recruteur professionnel français. Générez des questions d'entretien pertinentes avec des réponses concises. Répondez uniquement en JSON valide.",
+              "Vous êtes un recruteur professionnel français. Générez des questions d'entretien pertinentes. Répondez uniquement en JSON valide.",
           },
           { role: "user", content: prompt },
         ],

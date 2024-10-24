@@ -7,9 +7,9 @@
       <UDivider class="my-6">
         <p>Description</p>
       </UDivider>
-      <div class="text-gray-200 duration-300">
+      <div class="duration-300">
         <div v-if="showMore">
-          <p>
+          <p class="text-stone-950 dark:text-stone-200">
             {{ store.jobDescription }}
             <span class="text-primary-500 cursor-pointer" @click="showMore = false"
               >... réduire</span
@@ -41,7 +41,7 @@
         color="primary"
       >
         <template #item="{ item }">
-          <p class="ml-4 text-gray-200 italic">{{ item.content }}</p>
+          <p class="ml-4 text-stone-950 dark:text-stone-200 italic">{{ item.content }}</p>
         </template>
       </UAccordion>
 
